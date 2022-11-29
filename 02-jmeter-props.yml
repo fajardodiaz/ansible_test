@@ -1,0 +1,13 @@
+- name: Playbook to set jmeter properties
+  hosts: all
+  remote_user: ubuntu
+  tasks:
+    - name: Update ubuntu  
+      apt:
+        update_cache: yes
+
+    - name: copy rmi_keystore file
+      copy:
+        src: ./rmi_keystore.jks
+        dest: /opt/apache-jmeter-5.5/bin/
+        owner: ubuntu

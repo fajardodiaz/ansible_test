@@ -1,0 +1,14 @@
+Host ubuntu-slave-1
+    HostName 44.202.53.94
+    User ubuntu
+    IdentityFile /home/ubuntu/KEYS/AutomatizacionDevops.pem
+
+Host ubuntu-slave-2
+    HostName 44.202.53.94
+    User ubuntu
+    IdentityFile /home/ubuntu/KEYS/AutomatizacionDevops.pem
+
+Host ubuntu-slave-3
+    HostName 44.202.53.94
+    User ubuntu
+    IdentityFile /home/ubuntu/KEYS/AutomatizacionDevops.pem

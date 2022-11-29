@@ -1,0 +1,128 @@
+- name: Playbook to install common tools
+  hosts: all
+  remote_user: ubuntu
+  tasks:
+  - name: Install unzip
+    apt:
+        update_cache: yes
+        name: unzip
+        state: latest
+  
+  - name: Install curl
+    apt:
+      name: curl
+      state: latest
+  
+  - name: Install wget
+    apt:
+      name: wget
+      state: latest
+  
+  - name: Install vim
+    apt:
+      name: vim
+      state: latest
+
+  - name: Install git
+    apt:
+      name: git
+      state: latest
+
+  - name: Install JAVA
+    apt:
+        update_cache: yes 
+        name: openjdk-11-jdk
+        state: present 
+  
+  - name: Install Python3
+    apt:
+        update_cache: yes 
+        name: python3
+        state: latest
+
+  - name: Install pip3
+    apt:
+        update_cache: yes 
+        name: python3-pip
+        state: latest
+
+  - name: Set the JAVA_HOME in /etc/profile file
+    lineinfile:
+        path: /etc/profile
+        state: present
+        line: "{{ item }}"
+    with_items:
+        - 'export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"'
+        - 'export PATH=$PATH:$JAVA_HOME/bin'
+
+  - name: Reload /etc/profile file
+    shell:
+        cmd: . /etc/profile
+    
+  - name: Install bzt
+    shell:
+      cmd: pip3 install bzt
+
+  - name: Copy .bzt-rc file
+    copy:
+        src: ./.bzt-rc
+        dest: /home/ubuntu
+        owner: ubuntu
+        mode: '0744'
+
+  - name: Copy .bzt-rc file
+    copy:
+        src: ./.bzt-rc
+        dest: /root
+        owner: ubuntu
+        mode: '0744'
+
+  - name: Download jmeter
+    get_url:
+      url: https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip
+      dest: /home/ubuntu/apache-jmeter-5.5.zip
+  
+  - name: Unzip jmeter
+    unarchive:
+      src: /home/ubuntu/apache-jmeter-5.5.zip
+      dest: /opt/
+      remote_src: yes
+  
+  - name: Download cmd runner
+    get_url: 
+      url: http://search.maven.org/remotecontent?filepath=kg/apc/cmdrunner/2.2/cmdrunner-2.2.jar
+      dest: /opt/apache-jmeter-5.5/lib
+  
+  - name: Download plugin manager
+    get_url: 
+      url: https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.8/jmeter-plugins-manager-1.8.jar
+      dest: /opt/apache-jmeter-5.5/lib/ext/
+  
+  - name: Install plugin manager
+    shell:
+      cmd: java -cp /opt/apache-jmeter-5.5/lib/ext/jmeter-plugins-manager-1.8.jar org.jmeterplugins.repository.PluginManagerCMDInstaller
+  
+  - name: Replace PluginsManagerCMD.sh file
+    copy:
+      src: ./PluginsManagerCMD.sh
+      dest: /opt/apache-jmeter-5.5/bin/
+
+  - name: Set the JMeterHOME in /etc/profile file
+    lineinfile:
+        path: /etc/profile
+        state: present
+        line: "{{ item }}"
+    with_items:
+        - 'export PATH="/opt/apache-jmeter-5.5/bin/:$PATH"'
+
+  - name: Reload /etc/profile file
+    shell:
+        cmd: . /etc/profile
+
+  - name: Improve HEAP size
+    lineinfile:
+        path: /opt/apache-jmeter-5.5/bin/jmeter.sh
+        state: present
+        line: "{{ item }}"
+    with_items:
+        - 'JVM_ARGS=”-Xms512m -Xmx14000m” jmeter.sh'

@@ -1,0 +1,19 @@
+- name: Playbook to copy ssh file
+  hosts: slave_workers
+  remote_user: ubuntu
+  tasks:
+  - name: Copy ssh key
+    copy:
+        src: /home/ubuntu/KEYS/AutomatizacionDevops.pem
+        dest: /home/ubuntu
+        owner: ubuntu
+        mode: '0400'
+  
+  - name: Review if ssh directory exist
+    shell:
+      cmd: mkdir -p ~/.ssh
+
+  - name: Copy ssh config file
+    copy:
+      src: ./config
+      dest: ~/.ssh/config
